@@ -112,18 +112,226 @@ La régularisation L1 avec solver ‘saga’ aide à obtenir un modèle plus par
 
 Pour aller plus loin, l’intégration de techniques de Deep Learning, notamment les CNN, serait la voie privilégiée pour exploiter pleinement la nature visuelle des images médicales.
 
-## 2. Modèle 2 : Titre du deuxième modèle
+## 2. Détection de la Pneumonie via Random Forest
 
-Ici, description et analyse de ce modèle.
+### 2.1 Introduction
 
-## 3. Modèle 3 : Titre du troisième modèle
+Ce projet a pour but de classifier des radiographies thoraciques en trois catégories : **Normal**, **Pneumonie Bactérienne** et **Pneumonie Virale**.  
+Nous explorons ici une méthode alternative au modèle PCA + régression logistique, en utilisant un **Random Forest**, algorithme d’ensemble basé sur des arbres de décision.  
+Cette approche se veut simple, robuste, et ne nécessite pas d’hypothèses fortes sur la distribution des données.
 
-Description et analyse de ce modèle.
+### 2.2 Exploration des Données
 
-## 4. Comparatif des Modèles
+Le dataset utilisé contient trois sous-ensembles : **train**, **val** et **test**. Les images sont réparties équitablement entre les trois classes (Normal, BACTERIA, VIRUS).  
+Une exploration visuelle (images et histogrammes RGB) a permis de vérifier la diversité des cas cliniques et la répartition des couleurs dans les canaux.
+
+### 2.3 Prétraitement des Images
+
+Le pipeline de prétraitement inclut :
+
+- Redimensionnement des images à 128x128 pixels
+- Conversion des images du format BGR vers RGB
+- Encodage des labels en valeurs numériques
+- Séparation des données en variables explicatives `X` (images) et cibles `y` (étiquettes)
+
+Les images sont ensuite **aplaties** en vecteurs pour pouvoir être traitées par le classifieur.
+
+### 2.4 Extraction des Caractéristiques
+
+Contrairement aux réseaux convolutifs, les Random Forest ne traitent pas directement des images matricielles.  
+Chaque image est donc convertie en **vecteur plat de caractéristiques**.  
+Des approches plus avancées pourraient envisager l'extraction de **statistiques de texture**, **histogrammes de gradients**, ou **descripteurs de moments**, mais ici, la version de base se contente d'un aplatissage simple.
+
+### 2.5 Modélisation avec Random Forest
+
+Le modèle Random Forest est implémenté via `sklearn.ensemble.RandomForestClassifier`.  
+L'entraînement est réalisé sur le sous-ensemble `train`, la validation sur `val`, et le test final sur `test`.
+
+#### Recherche des hyperparamètres par GridSearchCV
+
+Les meilleurs paramètres obtenus sont :
+
+| Hyperparamètre        | Valeur sélectionnée |
+|------------------------|---------------------|
+| `criterion`            | `entropy`           |
+| `max_depth`            | `None`              |
+| `max_features`         | `sqrt`              |
+| `min_samples_split`    | `10`                |
+| `n_estimators`         | `300`               |
+
+Cette configuration a permis d’atteindre une **précision d’environ 78 %** sur le jeu de test.
+
+### 2.6 Évaluation du Modèle
+
+L’évaluation a été réalisée à l’aide des métriques classiques :
+
+- **Matrice de confusion** : permet d’observer les erreurs entre les trois classes
+- **Classification Report** : précision, rappel, F1-score par classe
+- **Analyse d’erreurs** : des exemples d’images mal classées peuvent mettre en lumière certaines limitations (chevauchement visuel entre VIRUS et BACTERIA, par exemple)
+
+### 2.7 Conclusion
+
+Le modèle Random Forest constitue une **première approche simple et interprétable** pour classifier des radiographies pulmonaires.  
+Toutefois, les performances sont limitées (78 % de précision) comparées à d’autres méthodes.  
+Cela s’explique par l’absence de prise en compte de la structure spatiale des images.  
+L’utilisation de modèles plus complexes, tels que les **réseaux convolutifs (CNN)**, semble inévitable pour améliorer significativement la performance sur ce type de données.
+
+
+## 3. Impact des Paramètres sur la Régression Linéaire
+
+### 3.1 Introduction
+
+Ce modèle explore l’utilisation de la **régression linéaire** pour la classification de radiographies thoraciques en trois catégories : **Normal**, **Pneumonie Bactérienne** et **Pneumonie Virale**.  
+Contrairement aux classifieurs classiques, les prédictions continues sont **arrondies** et **bornées** pour être mappées sur des classes discrètes (0, 1, 2).
+
+L’objectif est d’évaluer l’influence de certains paramètres — taille d’image, normalisation, intercept — sur les performances du modèle.
+
+### 3.2 Description du Dataset et Prétraitement
+
+Les images sont transformées comme suit :
+
+- Conversion en niveaux de gris
+- Aplatissement en vecteurs
+- Normalisation des pixels dans l’intervalle [0, 1]
+- Redimensionnement (principalement en 128x128, mais d’autres tailles ont été testées)
+
+Les données sont divisées de manière **stratifiée** en 80% pour l’entraînement et 20% pour le test.
+
+### 3.3 Modèle Baseline
+
+Le modèle de base repose sur `LinearRegression()` de `scikit-learn`.  
+La prédiction continue est arrondie avec `np.round()` puis **clipée** dans l’intervalle [0, 2].
+
+| Paramètre           | Valeur                             |
+| -------------------- | ---------------------------------- |
+| Modèle              | `LinearRegression()`             |
+| Taille des images    | `(128, 128)`                     |
+| Mode                 | Niveaux de gris, images aplaties   |
+| Normalisation        | Pixels divisés par 255            |
+| Jeu de test          | 20% des données, stratifié       |
+| Arrondi prédictions | `np.round()` + `np.clip(0, 2)`   |
+
+**Accuracy obtenue : 73%**
+
+### 3.4 Expérimentations
+
+#### 3.4.1 Variation de la Taille des Images
+
+| ID | Modification              | Description                              | Résultat (Accuracy) |
+| -- | ------------------------- | ---------------------------------------- | -------------------- |
+| V1 | `image_size=(64, 64)`     | Taille plus petite, moins de dimensions  | 62%                  |
+| V2 | `image_size=(256, 256)`   | Taille plus grande, plus d’informations  | 71%                  |
+
+**Observation :** Une taille d’image trop réduite nuit à la précision, probablement en raison d’une perte d’information. Une taille supérieure à 128x128 améliore légèrement les performances mais augmente le coût computationnel.
+
+#### 3.4.2 Ajustement de l’Intercept
+
+| ID | Modification             | Description                            | Résultat (Accuracy) |
+| -- | ------------------------ | -------------------------------------- | -------------------- |
+| M1 | `fit_intercept=False`    | Ne pas apprendre de biais              | 68%                  |
+
+**Observation :** Supprimer le biais (`intercept`) dégrade la précision. Cela montre son importance dans le bon ajustement des prédictions.
+
+### 3.5 Exemple de Code avec Régression Ridge
+
+```python
+from sklearn.linear_model import Ridge
+from sklearn.model_selection import train_test_split
+import numpy as np
+
+# Entraînement du modèle
+model = Ridge(alpha=1.0)
+model.fit(X_train, y_train)
+
+# Prédiction
+y_pred = model.predict(X_test)
+
+# Arrondi et clipping des prédictions pour correspondre aux classes 0,1,2
+y_pred_rounded = np.clip(np.round(y_pred), 0, 2).astype(int)
+
+# Calcul de l'accuracy
+accuracy = np.mean(y_pred_rounded == y_test)
+print(f"Accuracy: {accuracy:.2f}")
+```
+
+### 3.6 Conclusion
+La régression linéaire simple, bien que peu adaptée de prime abord à la classification, permet ici d’atteindre une précision correcte (73%).
+Les expérimentations montrent :
+
+L’importance de la taille des images : trop petite = perte d’information, trop grande = gain modéré + coût accru
+
+Le rôle essentiel du biais (intercept) dans l’apprentissage
+
+Pour améliorer ces résultats, on pourrait explorer :
+
+Des modèles régularisés (Ridge, Lasso)
+
+Des transformations non linéaires
+
+Des approches neuronales ou convolutives
+
+## 4. Détection de la Pneumonie via Régression Logistique
+
+### 4.1 Introduction
+
+Ce projet a pour objectif de classifier des radiographies thoraciques en trois catégories : **Normal**, **Pneumonie Bactérienne**, et **Pneumonie Virale**.  
+Nous utilisons ici un modèle de **régression logistique multinomiale**, approche linéaire classique bien connue pour sa robustesse et sa simplicité.
+
+### 4.2 Exploration des Données
+
+Le dataset est structuré en trois sous-ensembles :
+
+- **train**
+- **val**
+- **test**
+
+Les images sont étiquetées dans les classes `NORMAL`, `BACTERIA`, et `VIRUS`.  
+Une exploration visuelle (affichage d’images et histogrammes RGB) permet de mieux cerner la distribution des intensités et couleurs dans le jeu de données.
+
+### 4.3 Prétraitement des Données
+
+Les étapes de transformation incluent :
+
+- **Redimensionnement** des images à 128x128 pixels
+- Conversion BGR → RGB
+- Encodage des étiquettes (`NORMAL` → 0, `BACTERIA` → 1, `VIRUS` → 2)
+- Séparation en `X` (features) et `y` (labels)
+
+### 4.4 Extraction des Caractéristiques
+
+Les images matricielles sont aplaties en **vecteurs unidimensionnels** pour être compatibles avec le modèle de régression.
+
+- Aplatissement en vecteurs de taille `(128*128*3,)`
+- Optionnel : **normalisation des pixels** dans l’intervalle [0, 1]
+
+### 4.5 Modélisation avec Régression Logistique
+
+Le modèle est implémenté via `sklearn.linear_model.LogisticRegression`, avec les caractéristiques suivantes :
+
+- Mode `multinomial` (classification multi-classe)
+- Régularisation de type `L2` (ridge)
+- Solveur `saga` ou `lbfgs` selon les cas
+- Entraînement sur `train`, validation sur `val`, test final sur `test`
+
+### 4.6 Évaluation du Modèle
+
+Les performances sont analysées à l’aide de :
+
+- **Matrice de confusion**
+- **Classification report** : précision, rappel, F1-score par classe
+- **Analyse des erreurs** : examen de cas mal classés pour comprendre les limites du modèle
+
+### 4.7 Conclusion
+
+La **régression logistique multinomiale** constitue une **baseline solide et interprétable** pour des tâches de classification d’images.  
+Toutefois, ses performances sont limitées dès que la structure spatiale des images devient déterminante, ce qui est le cas pour les radiographies médicales.  
+Des techniques comme les **réseaux de neurones convolutifs (CNN)** devraient être privilégiées pour améliorer significativement les résultats.
+
+
+## 5. Comparatif des Modèles
 
 Synthèse comparative des performances, avantages, inconvénients, tableau récapitulatif, etc.
 
-## 5. Conclusion
+## 6. Conclusion
 
 Résumé des principaux résultats, enseignements, pistes d’amélioration, perspectives futures.
