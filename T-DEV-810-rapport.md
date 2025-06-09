@@ -21,9 +21,11 @@ Les sections suivantes détaillent les méthodologies employées, les résultats
 
 [4. Détection de la Pneumonie via Régression Logistique]()
 
-[5. Comparatif des Modèles](#4-comparatif-des-modèles)
+[5. Détection de la Pneumonie via KNearest-Neighbors]()
 
-[6. Conclusion](#5-conclusion)
+[6. Comparatif des Modèles]()
+
+[7. Conclusion]()
 
 ---
 
@@ -334,10 +336,55 @@ La **régression logistique multinomiale** constitue une **baseline solide et in
 Toutefois, ses performances sont limitées dès que la structure spatiale des images devient déterminante, ce qui est le cas pour les radiographies médicales.
 Des techniques comme les **réseaux de neurones convolutifs (CNN)** devraient être privilégiées pour améliorer significativement les résultats.
 
-## 5. Comparatif des Modèles
+## 5. Détection de la Pneumonie via KNearest-Neighbors (KNN)
+
+### Les données
+
+Les transformations appliqués aux images sont un redimensionnement de l'image en 128x128, puis un applitissement des images.
+Les labels sont transformées de sorte à obtenir ce format :
+
+#### Si on veut classifier que pneumonie ou sain (classification binaire)
+```
+```
+```
+```
+  - pneumonie = 1
+  - sain = 0
+#### Si on veut classifier le type de pneumonie (classification ternaire) 
+  - pneumonie virale = 2
+  - pneumonie bactérienne = 1
+  - sain = 0
+
+### Résultat 
+
+#### Meilleures Résultats
+
+| Paramètres | type classification | Accuracy |
+| ---------- | ------------------- | -------- |
+| 2          | binaire             | 79%      |
+| 12         | ternaire            | 66%      | 
+
+#### Courbes des précisions en fonction du nombre de voisin
+##### Binaire
+![./knn/classification_binaire.png]
+
+##### Trinaire
+![./knn/classification_trinaire.png]
+
+### Conclusion 
+
+L'algorithme pourrait être plus intéressant sur des données qui sont plus différentes les une des autres, par exemple une IA qui permet de voir quel
+animal est représenter sur l'image car un chien et un chat ont des grandes différences. 
+Dans notre cas, les images n'ont pas de différences visibles, une personne qui n'est pas du domaine n'arriverai pas à dire laquel est une pneumonie ou pas. 
+
+En plus KNN prends énormément de RAM car quand il cherche à prédire une image, il est obligé de mettre en mémoire chaque point de chaque image pour faire les calculs de distance le plus rapidement possible.
+
+On remarque sur les résultats que l'algorithme s'en sort moins bien avec la classification entre virale et bactérienne, car la différence est moins visible qu'entre une personne ayant une pneumonie et une personne qui n'en a pas.
+
+## 6. Comparatif des Modèles
 
 Synthèse comparative des performances, avantages, inconvénients, tableau récapitulatif, etc.
 
-## 6. Conclusion
+## 7. Conclusion
 
 Résumé des principaux résultats, enseignements, pistes d’amélioration, perspectives futures.
