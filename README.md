@@ -16,7 +16,7 @@ La problématique est la suivante :
 ## 1. Le jeu de données
 
 ### Où le trouver ?
-Les radiographies se trouvent  dans le dans le dossier [chest_XRay](https://github.com/EpitechMscProPromo2026/T-DEV-810-STG_10/tree/main/chest_Xray):
+Les radiographies se trouvent  dans le dans le dossier [chest_Xray](https://github.com/EpitechMscProPromo2026/T-DEV-810-STG_10/tree/main/chest_Xray):
 
 avec **5216** radiographies de train dont:
   - 1341 radiographies saines
@@ -46,14 +46,24 @@ Donc on a environs 88% des images pour l'entraînement et 12% pour les tests
 
 Les images se trouvant dans les dossiers *NORMAL* sont des radiographies saines, les dossiers *PNEUMONIA* sont des radiographies de pneumonies et le type de la pneumonies se trouve dans le nom de l'image (ex: image_241_virus.jpg)
 
-## Algorithme KNearest-Neighbors (KNN)
+## Transformations des données pour les Algorithmes
 
-### Transformations des données
+Pour permettre une comparaison entre chaque algorithme on a essayé d'avoir le plus souvent les mêmes traitement d'images à chaque fois, des précisions seront présentes si pour l'algorithme on a fait d'autres transformations.
 
-L'algortihme pour avoir une cohérence demande toujours le même nombre de features [^1]
+Les algorithmes demandent d'avoir le même nombre de features[^1] ce qui nous oblige a redimensionné les images dans une taille fixe, pour tous les algorithmes les images sont redimensionné entre 400x400 et 100x100 pixels dont le plus performant étant 128x128.
+
+On a obtenu ce chiffre en testant différentes tailles sur les algorithmes.
+
+Puis les images sont flatten[^2] car le modèle ne prends pas les tableaux à plusieurs dimensions.
+
+> [!example]
+> Une image en nuance de gris contient 2 dimensions (position x et y du pixel qui contient la valeur du gris dans le pixel)
+> Une image en couleur contient 3 dimensions (position x et y qui contiennent un tableau contenant les valeurs pour les couleurs RGB (Red-Blue-Green))
 
 [^1]: Une feature est un pixel de notre image qu'on souhaite passer dans le modèle
+[^2]: Transformations d'un tableau avec X dimensions en un tableau d'une seule dimension 
 
+## Algorithme KNearest-Neighbors (KNN)
 
 
 
