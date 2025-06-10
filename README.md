@@ -9,25 +9,38 @@ L’objectif est d’évaluer et comparer plusieurs modèles classiques — **r�
 La problématique est la suivante :
 **Quelle méthode de classification permet d’obtenir la meilleure précision tout en conservant une certaine interprétabilité et une complexité raisonnable pour le traitement des images médicales ?**
 
-Les sections suivantes détaillent les méthodologies employées, les résultats obtenus, ainsi qu’une synthèse comparative pour guider le choix du meilleur modèle.
-
 ## Table des Matières
 
-[1. Détection de Pneumonies via PCA et Régression Logistique]()
-
-[2. Détection de la Pneumonie via Random Forest](#2-modèle-2-titre-du-deuxième-modèle)
-
-[3. Détection de la Pneumonie via Régression Linéaire](#3-modèle-3-titre-du-troisième-modèle)
-
-[4. Détection de la Pneumonie via Régression Logistique]()
-
-[5. Détection de la Pneumonie via KNearest-Neighbors]()
-
-[6. Comparatif des Modèles]()
-
-[7. Conclusion]()
-
 ---
+
+## 1. Le jeu de données
+
+### Où le trouver ?
+Les radiographies se trouvent  dans le dans le dossier [chest_XRay](https://github.com/EpitechMscProPromo2026/T-DEV-810-STG_10/tree/main/chest_Xray):
+avec **5216** radiographies de train dont:
+  - 1341 radiographies saines
+  - 3875 radiographies de pneumonies
+
+et **624** radiographies de tests dont:
+  - 234 radiographies saines
+  - 390 radiographies de pneumonies
+
+Donc on a environs 88% des images pour l'entraînement et 12% pour les tests
+
+### Comment obtenir les libellés ?
+`.
+├── test/
+│   ├── NORMAL/
+│   │   └── nom_image
+│   └── PNEUMONIA/
+│       └── nom_image_(virus/bacterie)
+└── train/
+    ├── NORMAL/
+    │   └── nom_image
+    └── PNEUMONIA/
+        └── nom_image_(virus/bacterie)`
+
+Les images se trouvant dans les dossiers *NORMAL* sont des radiographies saines, les dossiers *PNEUMONIA* sont des radiographies de pneumonies et le type de la pneumonies se trouve dans le nom de l'image (ex: image_241_virus.jpg)
 
 ## 1. Détection de Pneumonies via PCA et Régression Logistique
 
@@ -374,8 +387,8 @@ Les labels sont transformées de sorte à obtenir ce format :
 ### Conclusion 
 
 L'algorithme pourrait être plus intéressant sur des données qui sont plus différentes les une des autres, par exemple une IA qui permet de voir quel
-animal est représenter sur l'image car un chien et un chat ont des grandes différences. 
-Dans notre cas, les images n'ont pas de différences visibles, une personne qui n'est pas du domaine n'arriverai pas à dire laquel est une pneumonie ou pas. 
+animal est représenté sur l'image car un chien et un chat ont des grandes différences. 
+Dans notre cas, les images n'ont pas d'énormes différences visibles, une personne qui n'est pas du domaine n'arriverai pas à dire laquel est une pneumonie ou pas. 
 
 En plus KNN prends énormément de RAM car quand il cherche à prédire une image, il est obligé de mettre en mémoire chaque point de chaque image pour faire les calculs de distance le plus rapidement possible.
 
