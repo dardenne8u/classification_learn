@@ -55,14 +55,24 @@ Les algorithmes demandent d'avoir le même nombre de features[^1] ce qui nous ob
 On a obtenu ce chiffre en testant différentes tailles sur les algorithmes.
 
 Puis les images sont flatten[^2] car le modèle ne prends pas les tableaux à plusieurs dimensions.
-[
+
 > Une image en nuance de gris contient 2 dimensions (position x et y du pixel qui contient la valeur du gris dans le pixel)
 > Une image en couleur contient 3 dimensions (position x et y qui contiennent un tableau contenant les valeurs pour les couleurs RGB (Red-Blue-Green))
-](#){.btn .btn-primary}
+
 [^1]: Une feature est un pixel de notre image qu'on souhaite passer dans le modèle
 [^2]: Transformations d'un tableau avec X dimensions en un tableau d'une seule dimension 
 
+---
+
+A partir de maintenant on va aborder les modèles tester, les résultats et une observation de nos résultats.
+Pour commencer tous les algorithmes en dehors du deep learning proviennent de la librairie `sklearn` qui implémente 
+directement les algorithmes facililant la mise en place.
+
 ## Algorithme KNearest-Neighbors (KNN)
+
+### Explication
+
+
 
 ### Résultat 
 
@@ -89,6 +99,45 @@ Dans notre cas, les images n'ont pas d'énormes différences visibles, une perso
 En plus KNN prends énormément de RAM car quand il cherche à prédire une image, il est obligé de mettre en mémoire chaque point de chaque image pour faire les calculs de distance le plus rapidement possible.
 
 On remarque sur les résultats que l'algorithme s'en sort moins bien avec la classification entre virale et bactérienne, car la différence est moins visible qu'entre une personne ayant une pneumonie et une personne qui n'en a pas.
+
+## Détection de la Pneumonie via Random Forest
+
+### Explication
+
+### Hyperparamètre
+
+Pour optimiser mes hyperparamètres j'ai utilisé une fonction de `sklean` se nommant `GridSearchCV` qui prends en paramètres une liste de dictionnaires associant 
+le nom de l'hyperparamètre avec une liste de valeur possible. Ainsi cette fonction va exécuter automatiquement le modèle avec les différents hyperparamètres 
+et retourne les hyperparamètres qui ont mieux performés.
+
+#### Meilleures Hyperparamètres
+
+Les meilleurs paramètres obtenus sont :
+
+| Hyperparamètre       | Valeur sélectionnée |
+| --------------------- | --------------------- |
+| `criterion`         | `entropy`           |
+| `max_depth`         | `None`              |
+| `max_features`      | `sqrt`              |
+| `min_samples_split` | `10`                |
+| `n_estimators`      | `300`               |
+
+Cette configuration a permis d’atteindre une **précision d’environ 78 %** sur le jeu de test.
+
+### Évaluation du Modèle
+
+L’évaluation a été réalisée à l’aide des métriques classiques :
+
+- **Matrice de confusion** : permet d’observer les erreurs entre les trois classes
+- **Classification Report** : précision, rappel, F1-score par classe
+- **Analyse d’erreurs** : des exemples d’images mal classées peuvent mettre en lumière certaines limitations (chevauchement visuel entre VIRUS et BACTERIA, par exemple)
+
+### Observation
+
+Le modèle Random Forest constitue une **première approche simple et interprétable** pour classifier des radiographies pulmonaires.
+Toutefois, les performances sont limitées (78 % de précision) comparées à d’autres méthodes.
+Cela s’explique par l’absence de prise en compte de la structure spatiale des images.
+L’utilisation de modèles plus complexes, tels que les **réseaux convolutifs (CNN)**, semble inévitable pour améliorer significativement la performance sur ce type de données.
 
 
 
@@ -229,71 +278,6 @@ Les résultats suggèrent qu’une réduction modérée de la taille des images 
 La régularisation L1 avec solver ‘saga’ aide à obtenir un modèle plus parcimonieux sans perte de précision notable.
 
 Pour aller plus loin, l’intégration de techniques de Deep Learning, notamment les CNN, serait la voie privilégiée pour exploiter pleinement la nature visuelle des images médicales.
-
-## 2. Détection de la Pneumonie via Random Forest
-
-### 2.1 Introduction
-
-Ce projet a pour but de classifier des radiographies thoraciques en trois catégories : **Normal**, **Pneumonie Bactérienne** et **Pneumonie Virale**.
-Nous explorons ici une méthode alternative au modèle PCA + régression logistique, en utilisant un **Random Forest**, algorithme d’ensemble basé sur des arbres de décision.
-Cette approche se veut simple, robuste, et ne nécessite pas d’hypothèses fortes sur la distribution des données.
-
-### 2.2 Exploration des Données
-
-Le dataset utilisé contient trois sous-ensembles : **train**, **val** et **test**. Les images sont réparties équitablement entre les trois classes (Normal, BACTERIA, VIRUS).
-Une exploration visuelle (images et histogrammes RGB) a permis de vérifier la diversité des cas cliniques et la répartition des couleurs dans les canaux.
-
-### 2.3 Prétraitement des Images
-
-Le pipeline de prétraitement inclut :
-
-- Redimensionnement des images à 128x128 pixels
-- Conversion des images du format BGR vers RGB
-- Encodage des labels en valeurs numériques
-- Séparation des données en variables explicatives `X` (images) et cibles `y` (étiquettes)
-
-Les images sont ensuite **aplaties** en vecteurs pour pouvoir être traitées par le classifieur.
-
-### 2.4 Extraction des Caractéristiques
-
-Contrairement aux réseaux convolutifs, les Random Forest ne traitent pas directement des images matricielles.
-Chaque image est donc convertie en **vecteur plat de caractéristiques**.
-Des approches plus avancées pourraient envisager l'extraction de **statistiques de texture**, **histogrammes de gradients**, ou **descripteurs de moments**, mais ici, la version de base se contente d'un aplatissage simple.
-
-### 2.5 Modélisation avec Random Forest
-
-Le modèle Random Forest est implémenté via `sklearn.ensemble.RandomForestClassifier`.
-L'entraînement est réalisé sur le sous-ensemble `train`, la validation sur `val`, et le test final sur `test`.
-
-#### Recherche des hyperparamètres par GridSearchCV
-
-Les meilleurs paramètres obtenus sont :
-
-| Hyperparamètre       | Valeur sélectionnée |
-| --------------------- | --------------------- |
-| `criterion`         | `entropy`           |
-| `max_depth`         | `None`              |
-| `max_features`      | `sqrt`              |
-| `min_samples_split` | `10`                |
-| `n_estimators`      | `300`               |
-
-Cette configuration a permis d’atteindre une **précision d’environ 78 %** sur le jeu de test.
-
-### 2.6 Évaluation du Modèle
-
-L’évaluation a été réalisée à l’aide des métriques classiques :
-
-- **Matrice de confusion** : permet d’observer les erreurs entre les trois classes
-- **Classification Report** : précision, rappel, F1-score par classe
-- **Analyse d’erreurs** : des exemples d’images mal classées peuvent mettre en lumière certaines limitations (chevauchement visuel entre VIRUS et BACTERIA, par exemple)
-
-### 2.7 Conclusion
-
-Le modèle Random Forest constitue une **première approche simple et interprétable** pour classifier des radiographies pulmonaires.
-Toutefois, les performances sont limitées (78 % de précision) comparées à d’autres méthodes.
-Cela s’explique par l’absence de prise en compte de la structure spatiale des images.
-L’utilisation de modèles plus complexes, tels que les **réseaux convolutifs (CNN)**, semble inévitable pour améliorer significativement la performance sur ce type de données.
-
 ## 3. Impact des Paramètres sur la Régression Linéaire
 
 ### 3.1 Introduction
