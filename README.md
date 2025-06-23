@@ -296,10 +296,6 @@ Des transformations non linéaires
 
 Des approches neuronales ou convolutives
 
-## 6. Comparatif des Modèles
-
-Synthèse comparative des performances, avantages, inconvénients, tableau récapitulatif, etc.
-
 ## 7. Conclusion
 
 Résumé des principaux résultats, enseignements, pistes d’amélioration, perspectives futures.
