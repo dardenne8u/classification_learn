@@ -299,6 +299,61 @@ Des transformations non linéaires
 
 Des approches neuronales ou convolutives
 
+## Convolution Neural Networks (CNN)
+### Explication
+
+Les réseaux de neurones convolutifs (CNN) sont spécialement conçus pour traiter les données structurées en grille, comme les images. Ils exploitent des couches de convolution pour extraire automatiquement des caractéristiques pertinentes (bords, textures, motifs). Les CNN sont aujourd’hui la référence pour la classification d’images médicales.
+
+### Architecture utilisée
+
+Nous avons utilisé une architecture simple composée de :
+
+- 1 couche de convolution (Conv2D) avec 32 filtres, activation ReLU et padding 'same'
+- 1 couche de pooling (MaxPooling2D) pour réduire la dimensionnalité
+- Une couche de flatten pour passer à un vecteur 1D
+- 1 couche dense (Dense) avec 32 neurones et activation ReLU
+- 1 couche de sortie dense avec 1 neurone et activation sigmoid (pour la classification binaire)
+
+Exemple de code (Keras) :
+
+```python
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
+
+baseline = Sequential()
+baseline.add(Conv2D(32, (3,3), activation='relu', padding='same', input_shape=[128,128,1]))
+baseline.add(MaxPooling2D(pool_size=(2,2)))
+baseline.add(Flatten())
+baseline.add(Dense(32, activation='relu'))
+baseline.add(Dense(1, activation='sigmoid'))
+```
+
+
+### Résultats
+
+Après entraînement sur 30 époques , le modèle atteint :
+
+- **Accuracy sur le jeu de test : ~97%**
+- Amélioration nette par rapport aux modèles de machine learning
+- Meilleure capacité à distinguer les trois classes, y compris entre bactérienne et virale
+
+### Accuracy
+![classification binaire](./Keras/accuracy_curve.png)
+### Loss
+![classification binaire](./Keras/loss_curve.png)
+
+
+### Observation
+
+Les CNN surpassent largement les méthodes classiques dès lors que la structure spatiale de l’image est importante. Ils nécessitent cependant plus de données, de puissance de calcul et un temps d’entraînement plus long.
+
+Pour aller plus loin, on pourrait :
+
+- Utiliser des architectures plus profondes (ResNet, VGG)
+- Appliquer le transfert learning avec des modèles pré-entraînés
+- Explorer des techniques d’explicabilité pour la médecine
+
+
 ## 7. Conclusion
 
 Résumé des principaux résultats, enseignements, pistes d’amélioration, perspectives futures.
