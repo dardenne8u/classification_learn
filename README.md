@@ -165,6 +165,9 @@ L’objectif est de trouver un compromis entre richesse des données conservées
 
 #### Sans PCA
 
+### Matrix de confusion
+![classification binaire](./LogisticRegression/confusion_matrix.png)
+
 #### Avec PCA
 
 ##### Impact de la taille des images
