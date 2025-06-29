@@ -299,6 +299,43 @@ Des transformations non linéaires
 
 Des approches neuronales ou convolutives
 
+
+## Cross-Décomposition (PLS)
+
+### Explication
+
+La **Partial Least Squares (PLS)** est une méthode hybride combinant réduction de dimension et régression. Elle cherche à extraire des composantes latentes qui maximisent à la fois la variance des variables explicatives et leur corrélation avec la variable cible.
+
+### Hyperparamètres
+
+Nous avons testé différentes valeurs pour le nombre de composantes latentes (`n_components`) :
+
+| ID  | n_components | Description                            |
+| --- | ------------ | -------------------------------------- |
+| C5  | 5            | Compression forte, moins de dimensions |
+| C10 | 10           | Compromis entre vitesse et expressivité |
+| C20 | 20           | Plus de richesse d'information         |
+| C50 | 50           | Très riche, risque de bruit accru      |
+
+### Résultats
+
+| ID  | n_components | Accuracy sur le jeu de test |
+| --- | ------------ | --------------------------- |
+| C5  | 5            | 80 %                        |
+| C10 | 10           | 84 %                        |
+| C20 | 20           | 87 %                        |
+| C50 | 50           | 86 %                        |
+
+### Observation
+
+- Le score maximal atteint 87 % avec 20 composantes, comparable aux meilleures configurations de PCA + régression logistique.
+- PLS offre l’avantage d’une interprétabilité accrue : chaque composante est une combinaison linéaire des pixels, facilitant l’analyse des zones d’intérêt.
+- Au-delà de 20 composantes, la performance se stabilise voire diminue légèrement, indiquant un compromis optimal autour de 20.
+
+**Conclusion partielle :**  
+La PLS apparaît comme une méthode efficace et interprétable, rivalisant avec les meilleurs modèles classiques tout en offrant une dimension explicative plus directe.
+
+
 ## Convolution Neural Networks (CNN)
 ### Explication
 
