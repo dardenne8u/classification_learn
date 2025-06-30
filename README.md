@@ -109,6 +109,8 @@ On remarque sur les résultats que l'algorithme s'en sort moins bien avec la cla
 
 ### Explication
 
+L'algorithme random forest est basé sur un ensemble d'arbres de décision indépendant. Il vote un résultat et en assemblant les arbres de décisions il obtient un vote final qui représente la prédiction du projet.
+
 ### Hyperparamètre
 
 Pour optimiser mes hyperparamètres j'ai utilisé une fonction de `sklean` se nommant `GridSearchCV` qui prends en paramètres une liste de dictionnaires associant 
@@ -145,6 +147,8 @@ L’utilisation de modèles plus complexes, tels que les **réseaux convolutifs 
 
 #### Régression logistique
 
+La régression logistique est un modèle statistique qui permet de prédire la probabilité d'appartenance à une catégorie binaire (ex : oui/non) en fonction de variables explicatives. Elle utilise une fonction logistique pour transformer une combinaison linéaire des prédicteurs en une probabilité comprise entre 0 et 1.
+
 #### PCA
 
 La PCA est appliquée pour réduire la dimensionnalité des vecteurs d’images tout en conservant la majorité de la variance. Différentes configurations ont été testées :
@@ -165,7 +169,7 @@ L’objectif est de trouver un compromis entre richesse des données conservées
 
 #### Sans PCA
 
-### Matrix de confusion
+##### Matrix de confusion
 ![classification binaire](./LogisticRegression/confusion_matrix.png)
 
 #### Avec PCA
