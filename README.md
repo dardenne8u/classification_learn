@@ -1,5 +1,8 @@
 # T-DEV-810
 
+Le sujet a été traiter durant ma formation à Epitech
+Nous étions en équipe de quatre
+
 ## Introduction
 
 La détection automatisée des pneumonies à partir de radiographies thoraciques constitue un enjeu majeur pour améliorer le diagnostic médical. Ce rapport, réalisé dans le cadre du module **T-DEV-810**, explore différentes approches de classification supervisée pour distinguer trois classes : **Normal**, **Pneumonie Bactérienne** et **Pneumonie Virale**.
